@@ -16,7 +16,7 @@ async function thwomp_filtered_level_list(parameters) {
     // get all of the codes out of the arguments and remove them from the search terms
     let codes = []
     searchTerms = searchTerms.filter(term => {
-        term = term.replace(/^  code:/, "")
+        term = term.replace(/^code:/, "")
         if (term.match(/^...-...-...$/)) {
             codes.push(term.toUpperCase())
             return false
