@@ -1,7 +1,7 @@
 // get a list of levels meeting search criteria in parameters
 
 // requires
-const { mm2Genres } = require("../constants/genres")
+const { mm2Genres, gtf } = require("../constants/genres")
 const { gtc } = require("../constants/thwomp_genre_code")
 const tgr = require("../functions/tgrAPI")
 const CourseUploader = require("../models/CourseUploader")
@@ -16,7 +16,7 @@ async function thwomp_filtered_level_list(parameters) {
     // get all of the codes out of the arguments and remove them from the search terms
     let codes = []
     searchTerms = searchTerms.filter(term => {
-        term = term.replace(/^(?:code|maker|level):/, "")
+        term = term.replace(/^  code:/, "")
         if (term.match(/^...-...-...$/)) {
             codes.push(term.toUpperCase())
             return false
@@ -37,14 +37,27 @@ async function thwomp_filtered_level_list(parameters) {
             return true
         }
     })
-    
-    // get all genres (including thwomp genres)
-    const genres = []
-    const allGenres = mm2Genres.concat(Object.keys(gtc))
+
+    // get all mm2 genres
+    let genres = []
     searchTerms = searchTerms.filter(term => {
         term = term.replace(/^genre:/, "")
-        if (allGenres.includes(term)) {
-            genres.push(term)
+        if (mm2Genres.includes(term)) {
+            genres.push(gtf[term])
+            // we want to keep themed so that thwomp genre can grab it
+            return term == "themed"
+        } else {
+            return true
+        }
+    })
+
+    // get thwomp genres (include themed in both)
+    let thwompGenres = []
+    searchTerms = searchTerms.filter(term => {
+        term = term.replace(/^genre:/, "")
+        term = gtc?.[term]
+        if (term) {
+            thwompGenres.push(term)
             return false
         } else {
             return true
@@ -58,11 +71,9 @@ async function thwomp_filtered_level_list(parameters) {
         possibleCurators.push(term)
     })
 
-    // if (searchTerms.length != 0) {
-    //     return `One or more of the parameters you have entered is invalid.`
-    // }
-
     // remove all duplicates
+    genres = genres.filter((genre, i, arr) => arr.indexOf(genre) == i)
+    thwompGenres = thwompGenres.filter((genre, i, arr) => arr.indexOf(genre) == i)
     codes = codes.filter((code, i, arr) => arr.indexOf(code) == i)
     difficulties = difficulties.filter((code, i, arr) => arr.indexOf(code) == i)
     possibleCurators = possibleCurators.filter((code, i, arr) => arr.indexOf(code) == i)
@@ -76,8 +87,10 @@ async function thwomp_filtered_level_list(parameters) {
             levelCodes.push(code)
         } else if (levelJSON.error == "Code corresponds to a maker") {
             makerCodes.push(code)
+        } else if (levelJSON.error == "Invalid course ID") {
+            return `The code \`${code}\` does not correspond to a maker or level`
         } else {
-            return `The code \`${code}\` does not correspond to a maker or level.`
+            return levelJSON.error
         }
     }
 
@@ -87,16 +100,21 @@ async function thwomp_filtered_level_list(parameters) {
 
     // find levels with makers codes listed
     const makersExist = await CourseUploader.find({ id: { $in: makerCodes } })
+    // if (makersExist.length != makerCodes) return "One or more of the maker codes you have entered does not have a level in THWOMP"
     const makerObjectIds = makersExist.map(maker => maker._id)
-    
+
     // verify curators' existences
     const curatorsRegex = possibleCurators.map(curator => new RegExp(`^${curator}$`, "i"))
-    const curatorsExist = await ThwompUploader.find({ $or: [{ name: { $in: curatorsRegex } }, { id: { $in: curators } }] })
+    const curatorsExist = await ThwompUploader.find({ $or: [{ name: { $in: curatorsRegex } }, { id: { $in: possibleCurators } }] })
+    const curatorsNonExist = possibleCurators.filter(c => !curatorsExist.includes(c))
+    if (curatorsExist.length != possibleCurators.length) return `The following arguments were not understood: \`${curatorsNonExist.join(", ")}\`.`
     const curatorObjectIds = curatorsExist.map(curator => curator._id)
 
     // get all of the categories that have parameters
     let thwompEntryParameters = {}
-    // TODO add genres here
+    if (genres.length + thwompGenres.length != 0) {
+        thwompEntryParameters["$or"] = [{ "course.genres": { $in: genres } }, { "thwomp.genres": { $in: thwompGenres } }]
+    }
     if (levelCodes.length != 0) thwompEntryParameters["course.id"] = { $in: levelCodes }
     if (makerCodes.length != 0) thwompEntryParameters["course.uploader"] = { $in: makerObjectIds }
     if (difficulties.length != 0) thwompEntryParameters["course.difficulty"] = { $in: difficulties }

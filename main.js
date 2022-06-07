@@ -118,8 +118,10 @@ client.on("messageCreate", async (message) => {
             message.reply(answer).catch(err => console.error(err))
         } else if (answer?.text) {
             message.reply(answer.text, { embeds: [answer.embed], files: [answer.attachment] }).catch(err => console.error(err))
-        } else {
+        } else if (answer) {
             message.reply({ embeds: [answer.embed], files: [answer.attachment] }).catch(err => console.error(err))
+        } else {
+            message.reply("Something went wrong").catch(err => console.log(err))
         }
 
     }
