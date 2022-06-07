@@ -1,0 +1,27 @@
+{
+  "name": "goombot",
+  "version": "1.0.0",
+  "description": "bot for mm2 puzzle discord",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "birddog",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Hyperdogsix/goombot/issues"
+  },
+  "homepage": "https://github.com/Hyperdogsix/goombot#readme",
+  "dependencies": {
+    "chart.js": "^3.8.0",
+    "chartjs-node-canvas": "^4.1.6",
+    "discord.js": "^13.6.0",
+    "dotenv": "^16.0.0",
+    "mongoose": "^6.3.2",
+    "nodemon": "^2.0.16"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/birddogsix/GoomBot"
+  }
+}
