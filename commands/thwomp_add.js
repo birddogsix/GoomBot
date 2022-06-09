@@ -44,6 +44,8 @@ async function thwomp_add(parameters, commandName, message) {
             id: message.author.id
         })
 
+        await thwompUploader.save()
+
         if (!existingLevel.thwomp.uploaders.includes(thwompUploader._id)) {
             existingLevel.thwomp.uploaders.push(thwompUploader._id)
             existingLevel.thwomp.modified = Date.now()
