@@ -5,7 +5,9 @@ const { getMedals } = require("../functions/get_medals")
 // requires
 
 
-async function force_medal_amounts(oldMember, newMember, clearances) {
+async function force_medal_amounts(oldMember, newMember, clearances, botVars) {
+
+    if (newMember.guild.id != botVars.guildId) return
 
     // get who did it
     const updateLogs = await newMember.guild.fetchAuditLogs({
@@ -59,7 +61,7 @@ async function force_medal_amounts(oldMember, newMember, clearances) {
         newMember.setNickname(finalName).catch(err => console.log(err))
 
         // send message to channel
-        const notifChannel = await newMember.guild.channels.cache.get("974403970716037202")
+        const notifChannel = await newMember.guild.channels.cache.get(botVars.notificationChannel)
         notifChannel.send(`Username update: \`${oldName}\` to \`${newName}\`. Updated to: \`${finalName}\``).catch(err => console.log(err))
 
     }

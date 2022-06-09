@@ -4,6 +4,7 @@ const default_bot_variables = {
     guildId: "970383307500036137", // change these when we move to the main server
     curatorId: "971883166375755786",
     modId: "971883166375755786",
+    notificationChannel: "974403970716037202",
 }
 
 // variables for when we are testing on a different bot
@@ -12,6 +13,7 @@ const testing_bot_variables = {
     guildId: "970383307500036137",
     curatorId: "971883166375755786",
     modId: "971883166375755786",
+    notificationChannel: "974403970716037202",
 }
 
 exports.regular = default_bot_variables

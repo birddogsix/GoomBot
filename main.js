@@ -123,7 +123,7 @@ client.on("messageCreate", async (message) => {
         const mainGuild = await client.guilds.fetch(botVars.guildId)
         const commandIssuer = await mainGuild.members.fetch(message.author.id)
         if (!currentCommand?.clearances || commandIssuer._roles.find(role => currentCommand.clearances.includes(role))) {
-            answer = await currentCommand.command.run(args, botVars.prefix + currentCommand.name, message).catch(err => console.log(err))
+            answer = await currentCommand.command.run(args, botVars.prefix + currentCommand.name, message, botVars).catch(err => console.log(err))
         } else {
             answer = "You do not have permission to use that command."
         }
@@ -169,7 +169,7 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
 
     // run through all commands in this category
     gmuCommands.forEach(current => {
-        current.command.run(oldMember, newMember, current.clearances).catch(err => console.log(err))
+        current.command.run(oldMember, newMember, current.clearances, botVars).catch(err => console.log(err))
     })
 
 })

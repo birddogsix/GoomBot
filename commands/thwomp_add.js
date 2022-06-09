@@ -8,7 +8,7 @@ const CourseUploader = require("../models/CourseUploader")
 const ThwompUploader = require("../models/ThwompUploader")
 
 // command function contents
-async function thwomp_add(parameters, commandName, message) {
+async function thwomp_add(parameters, commandName, message, botVars) {
 
     const usage = `${commandName} LEV-ELC-ODE genre(s)`
 
@@ -63,8 +63,8 @@ async function thwomp_add(parameters, commandName, message) {
             name: levelJSON.uploader.name,
             id: levelJSON.uploader.code
         })
-        const notifChannel = await message.guild.channels.cache.get("974403970716037202")
-        notifChannel.send(`${courseUploader.name} has had their first level added to THWOMP!`).catch(err => console.log(err))
+        const notifChannel = await message.guild.channels.cache.get(botVars.notificationChannel)
+        notifChannel.send(`\`${courseUploader.name}\` has had their first level added to THWOMP!`).catch(err => console.log(err))
     }
     await courseUploader.save()
 

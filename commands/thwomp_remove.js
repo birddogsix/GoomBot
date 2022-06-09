@@ -3,12 +3,13 @@
 // requires
 const tgr = require("../functions/tgrAPI")
 const ThwompEntry = require("../models/ThwompEntry")
+const CourseUploader = require("../models/CourseUploader")
 
-async function thwomp_remove(parameters, commandName, message) {
+async function thwomp_remove(parameters, commandName, message, botVars) {
 
     const usage = `${commandName} LEV-ELC-ODE`
 
-    const codes = parameters.filter(param => param.match(/...-...-.../))
+    const codes = parameters.filter(param => param.match(/^...-...-...$/))
     if (codes.length != 1) {
         return `The command \`${commandName}\` requires one level code. Use the command as follows: \`${usage}\``
     }
@@ -26,6 +27,16 @@ async function thwomp_remove(parameters, commandName, message) {
 
     // delete it
     await ThwompEntry.deleteOne({ "course.id": code })
+
+    // see if the person who uploaded the level has anymore levels in thwomp and notify someone
+    const stillHasLevels = await ThwompEntry.findOne({ "course.uploader": entry.course.uploader })
+    if (!stillHasLevels) {
+        // send notif and delete user from thwompuploaders
+        const notifChannel = await message.guild.channels.cache.get(botVars.notificationChannel)
+        const uploader = await CourseUploader.findOne({ "_id": entry.course.uploader })
+        await CourseUploader.deleteOne({ "_id": entry.course.uploader })
+        notifChannel.send(`User \`${uploader.name}\` no longer has any levels in THWOMP`)
+    }
 
     return `\`${entry.course.name}\` has been removed from THWOMP.`
 
