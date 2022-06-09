@@ -11,6 +11,7 @@ const puzzle = ["puzzle-solving", "puzzlesolving", "puzzle"]
 const sas = ["shortandsweet", "short"]
 const technical = ["technical"]
 const shooter = ["shooter"]
+const speedrun = ["speedrun"]
 
 const mm2Genres = [
     ...standard,
@@ -25,7 +26,8 @@ const mm2Genres = [
     ...puzzle,
     ...sas,
     ...technical,
-    ...shooter
+    ...shooter,
+    ...speedrun
 ]
 
 const genre_to_formatted = {
@@ -42,6 +44,7 @@ const genre_to_formatted = {
     ...sas.reduce((obj, key) => ({ ...obj, [key]: "Short and sweet"}), {}),
     ...technical.reduce((obj, key) => ({ ...obj, [key]: "Technical"}), {}),
     ...shooter.reduce((obj, key) => ({ ...obj, [key]: "Shooter"}), {}),
+    ...speedrun.reduce((obj, key) => ({ ...obj, [key]: "Speedrun"}), {}),
 }
 
 exports.mm2Genres = mm2Genres

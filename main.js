@@ -4,8 +4,10 @@
 const { Client, Intents, MessageEmbed, Message, MessageAttachment } = require("discord.js")
 const client = new Client({ intents: [Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.DIRECT_MESSAGE_REACTIONS], partials: ['MESSAGE', 'CHANNEL', 'USER'] })
 
-// everything that needs to be updated to match the MM2 Puzzle Community Discord is here
-const { prefix, thwompUploaderId, modId, mainGuildId, botId } = require("./constants/bot_variables")
+// import the needed bot variables
+const { regular, testing } = require("./constants/bot_variables")
+const GoomBotId = "969684811193135256"
+let botVars = regular
 
 // fs and fetch setup
 const fs = require("fs")
@@ -24,22 +26,22 @@ const commands = [
     {
         name: "tadd",
         command: require("./commands/thwomp_add"),
-        clearances: [thwompUploaderId]
+        clearances: [botVars.curatorId]
     },
     {
         name: "tremove",
         command: require("./commands/thwomp_remove"),
-        clearances: [thwompUploaderId]
+        clearances: [botVars.curatorId]
     },
     {
         name: "tupdate",
         command: require("./commands/thwomp_update"),
-        clearances: [thwompUploaderId]
+        clearances: [botVars.curatorId]
     },
     {
         name: "tclean",
         command: require("./commands/thwomp_clean_unused"),
-        clearances: [thwompUploaderId]
+        clearances: [botVars.curatorId]
     },
     {
         name: "tsearch",
@@ -80,7 +82,13 @@ const combineTerms = ["short and sweet", "puzzle solving", "multiplayer vs", "mu
 
 // bot is online message
 client.once("ready", () => {
-    console.log("test my puzzle level")
+    console.log("Logged in as", client.user.tag)
+
+    // set the bot variables to the correct version (testing or default)
+    if (client.user.id != GoomBotId) {
+        botVars = testing
+    }
+
 })
 
 // on someone sending a message
@@ -90,10 +98,10 @@ client.on("messageCreate", async (message) => {
     if (message.author.bot) return
 
     // check if it is a command for the bot
-    if (!message.content.match(new RegExp(`^${prefix}`))) return
+    if (!message.content.match(new RegExp(`^${botVars.prefix}`))) return
 
     // prepare arguments (lower case everything and replace extra spaces, combine terms, split, remove first g! from command)
-    let args = message.content.replace(`${prefix}`, "").replaceAll(/\n/g, " ").replaceAll(/ {2,}/g, " ").toLowerCase()
+    let args = message.content.replace(`${botVars.prefix}`, "").replaceAll(/\n/g, " ").replaceAll(/ {2,}/g, " ").toLowerCase()
     combineTerms.forEach(term => {
         args = args.replaceAll(new RegExp(`${term}`, "g"), term.replaceAll(" ", ""))
     })
@@ -112,10 +120,10 @@ client.on("messageCreate", async (message) => {
         //run command (check clearance first to see if they have the correct role to run the command)
         let answer
         //const commandIssuer = await message.guild.members.fetch(message.author.id)
-        const mainGuild = await client.guilds.fetch(mainGuildId)
+        const mainGuild = await client.guilds.fetch(botVars.guildId)
         const commandIssuer = await mainGuild.members.fetch(message.author.id)
         if (!currentCommand?.clearances || commandIssuer._roles.find(role => currentCommand.clearances.includes(role))) {
-            answer = await currentCommand.command.run(args, prefix + currentCommand.name, message).catch(err => console.log(err))
+            answer = await currentCommand.command.run(args, botVars.prefix + currentCommand.name, message).catch(err => console.log(err))
         } else {
             answer = "You do not have permission to use that command."
         }
@@ -145,14 +153,14 @@ client.on("messageCreate", async (message) => {
     }
 
     // remove reaction because command is over
-    await message.reactions.resolve("🔄")?.users.remove(botId)
+    await message.reactions.resolve("🔄")?.users.remove(client.user.id)
 
 })
 
 const gmuCommands = [
     {
         command: require("./commands/force_medal_amounts"),
-        clearances: [modId]
+        clearances: [botVars.modId]
     },
 ]
 
