@@ -8,16 +8,17 @@ const { ctg } = require("../constants/thwomp_genre_code")
 
 async function thwomp_level_embed(thwomp_level_info) {
 
+    // get information like mii color, mii picture, and description that is not stored in thwomp_level_info
+    const levelJSON = await tgr.levelSearch(thwomp_level_info.course.id)
+    if (levelJSON?.error) return levelJSON.error
+    const favoriteColor = mii_studio_to_code(levelJSON.uploader.mii_studio_code)
+    const miiThumbnail = levelJSON.uploader.mii_image
+    const description = levelJSON.description
+
     // get, convert, and save level thumbnail
     const thumbnail = await tgr.thumbnailSearch(thwomp_level_info.course.id)
     const thumbnailBuffer = new Buffer.from(thumbnail)
     const attachment = new MessageAttachment(thumbnailBuffer, "thumbnail.jpg")
-
-    // get information like mii color, mii picture, and description that is not stored in thwomp_level_info
-    const levelJSON = await tgr.levelSearch(thwomp_level_info.course.id)
-    const favoriteColor = mii_studio_to_code(levelJSON.uploader.mii_studio_code)
-    const miiThumbnail = levelJSON.uploader.mii_image
-    const description = levelJSON.description
 
     const levelEmbed = new MessageEmbed()
         .setColor(favoriteColor)

@@ -15,12 +15,6 @@ async function thwomp_remove(parameters, commandName, message, botVars) {
     }
     const code = codes[0].replaceAll("-", "").toUpperCase()
 
-    // get the level JSON
-    let levelJSON = await tgr.levelSearch(code)
-
-    // error from levelJSON
-    if (levelJSON.error) return levelJSON.error
-
     // get the level from the data base
     const entry = await ThwompEntry.findOne({ "course.id": code })
     if (!entry) return `There is no level in THWOMP by that code.`
