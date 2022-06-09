@@ -44,6 +44,11 @@ const commands = [
         clearances: [botVars.curatorId]
     },
     {
+        name: "tcheck",
+        command: require("./commands/thwomp_check"),
+        clearances: [botVars.curatorId]
+    },
+    {
         name: "tsearch",
         command: require("./commands/thwomp_filtered_search")
     },

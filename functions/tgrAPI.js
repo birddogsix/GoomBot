@@ -2,10 +2,10 @@ const fetch = require("node-fetch")
 
 async function levelSearch(code) {
     const searchURL = "https://tgrcode.com/mm2/level_info/" + code
-    const result = await fetch(searchURL)
+    const result = await fetch(searchURL) // sometimes returns an internal server error
     const levelJson = await result.json().catch(err => {
         console.log(err)
-        return { error: "Something went wrong when trying to gather the information. Please try again in a few minutes." }
+        return {error: "Something went wrong when trying to gather the information. Please try again in a few minutes."}
     })
     return levelJson
 }

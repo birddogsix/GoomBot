@@ -25,6 +25,8 @@ async function info(parameters, commandName, message) {
     } else if (!JSON?.error) {
         const embedInfo = await level_embed(JSON)
         return embedInfo
+    } else if (JSON?.error == "Something went wrong when trying to gather the information. Please try again in a few minutes.") {
+        return JSON.error
     } else {
         return `The code you have entered does not correspond to a maker or level. Use the command as follows: \`${usage}\``
     }
