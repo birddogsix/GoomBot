@@ -13,11 +13,11 @@ async function levelSearch(code) {
 async function makerSearch(code) {
     const searchURL = "https://tgrcode.com/mm2/user_info/" + code
     const result = await fetch(searchURL)
-    const levelJson = await result.json().catch(err => {
+    const makerJson = await result.json().catch(err => {
         console.log(err)
         return { error: "Something went wrong when trying to gather the information. Please try again in a few minutes." }
     })
-    return levelJson
+    return makerJson
 }
 
 async function thumbnailSearch(code) {
@@ -26,6 +26,28 @@ async function thumbnailSearch(code) {
     return await result.arrayBuffer()
 }
 
+async function endlessSearch(difficulty) {
+    const searchURL = "https://tgrcode.com/mm2/search_endless_mode?count=1&difficulty=" + difficulty
+    const result = await fetch(searchURL)
+    const levelJsons = await result.json().catch(err => {
+        console.log(err)
+        return { error: "Something went wrong when trying to gather the information. Please try again in a few minutes." }
+    })
+    return levelJsons.courses[0]
+}
+
+async function newSearch() {
+    const searchURL = "https://tgrcode.com/mm2/search_new?count=1"
+    const result = await fetch(searchURL)
+    const levelJsons = await result.json().catch(err => {
+        console.log(err)
+        return { error: "Something went wrong when trying to gather the information. Please try again in a few minutes." }
+    })
+    return levelJsons.courses[0]
+}
+
+exports.newSearch = newSearch
+exports.endlessSearch = endlessSearch
 exports.levelSearch = levelSearch
 exports.makerSearch = makerSearch
 exports.thumbnailSearch = thumbnailSearch

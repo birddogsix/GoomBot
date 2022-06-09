@@ -4,6 +4,7 @@
 const { thumbnailSearch } = require("./tgrAPI")
 const { MessageEmbed, MessageAttachment } = require("discord.js")
 const { mii_studio_to_code } = require("./mii_studio_code_to_color")
+const ThwompEntry = require("../models/ThwompEntry")
 
 async function level_embed(levelJSON) {
 
@@ -27,6 +28,16 @@ async function level_embed(levelJSON) {
     const tags = levelJSON.tags_name.filter(tag => tag != "None").join(", ")
     // const flag = ":flag_" + levelJSON.uploader.country.toLowerCase() + ":"
 
+    // create fields (say if it is in thwomp only if it is)
+    let fields = [
+        { name: ":bust_in_silhouette: Plays", value: String(plays), inline: true },
+        { name: ":heart: Likes", value: String(likes), inline: true },
+        { name: ":footprints: Attempts", value: String(attempts), inline: true },
+        { name: ":checkered_flag: Clears", value: String(clears), inline: true },
+    ]
+    const inThwomp = await ThwompEntry.findOne({ "course.id": levelJSON.course_id })
+    if (inThwomp) fields.push({ name: "<:thwomp:984509792523522088> THWOMP", value: "This level is in THWOMP", inline: true})
+
     // create embed
     const levelEmbed = new MessageEmbed()
         .setColor(favoriteColor)
@@ -36,10 +47,7 @@ async function level_embed(levelJSON) {
         .setDescription(description)
         //.setThumbnail(uploaderMii)
         .addFields(
-            { name: ":bust_in_silhouette: Plays", value: String(plays), inline: true },
-            { name: ":heart: Likes", value: String(likes), inline: true },
-            { name: ":footprints: Attempts", value: String(attempts), inline: true },
-            { name: ":checkered_flag: Clears", value: String(clears), inline: true },
+            ...fields
         )
         .setImage("attachment://thumbnail.jpg")
         .setTimestamp()

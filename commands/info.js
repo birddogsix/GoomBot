@@ -19,6 +19,7 @@ async function info(parameters, commandName, message) {
 
     if (JSON?.error == "Code corresponds to a maker") {
         JSON = await tgr.makerSearch(code)
+        if (JSON.error == "No user with that ID") return `The code you have entered does not correspond to a maker or level. Use the command as follows: \`${usage}\``
         const embedInfo = await maker_embed(JSON)
         return embedInfo
     } else if (!JSON?.error) {

@@ -17,8 +17,6 @@ env.config()
 
 // mongoose models and setup
 const mg = require("mongoose")
-const ThwompLevel = require("./models/ThwompEntry")
-const { channel } = require("diagnostics_channel")
 mg.connect(process.env.MONGOURI)
 
 // import all of the commands
@@ -66,7 +64,15 @@ const commands = [
     {
         name: "info",
         command: require("./commands/info")
-    }
+    },
+    {
+        name: "random",
+        command: require("./commands/random")
+    },
+    {
+        name: "new",
+        command: require("./commands/new")
+    },
 ]
 
 // other constants to be used in main
@@ -117,10 +123,21 @@ client.on("messageCreate", async (message) => {
         // send command response
         if (typeof answer == "string") {
             message.reply(answer).catch(err => console.error(err))
-        } else if (answer?.text) {
-            message.reply(answer.text, { embeds: [answer.embed], files: [answer.attachment] }).catch(err => console.error(err))
         } else if (answer) {
-            message.reply({ embeds: [answer.embed], files: [answer.attachment] }).catch(err => console.error(err))
+            // create send arguments
+            let sendArgs = [
+                answer?.text,
+                {
+                    embeds: [answer?.embed],
+                    files: [answer?.attachment]
+                }
+            ]
+            // delete unused arguments
+            if (!answer?.embed) delete sendArgs[1].embeds
+            if (!answer?.attachment) delete sendArgs[1].files
+            if (!answer?.text) sendArgs.shift()
+            // send reply
+            message.reply(...sendArgs).catch(err => console.log(err))
         } else {
             message.reply("Something went wrong").catch(err => console.log(err))
         }
@@ -128,7 +145,7 @@ client.on("messageCreate", async (message) => {
     }
 
     // remove reaction because command is over
-    await message.reactions.resolve("🔄").users.remove(botId)
+    await message.reactions.resolve("🔄")?.users.remove(botId)
 
 })
 
@@ -139,7 +156,7 @@ const gmuCommands = [
     },
 ]
 
-// on member updating information (and joining i think ??)
+// on member updating information
 client.on("guildMemberUpdate", async (oldMember, newMember) => {
 
     // run through all commands in this category
