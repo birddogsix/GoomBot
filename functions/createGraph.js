@@ -18,6 +18,15 @@ async function createPieGraph(dataset, width = 400, height = 400) {
             }],
             labels: Object.keys(dataset),
         },
+        options: {
+            plugins: {
+                legend: {
+                    labels: {
+                        color: "white"
+                    }
+                }
+            }
+        }
     }
 
     const imageBuffer = await chart1.renderToBuffer(config, "image/png")
