@@ -11,7 +11,7 @@ async function thwomp_level_update(parameters, commandName, message) {
 
     // we also need to include genre updates
 
-    const usage = `Your command is invalid. Use the command in one of the following ways:\n\`${commandName} XXX-XXX-XXX\` to update a level's info or a maker name.\n\`${commandName} XXX-XXX-XXX genre\` to update the THWOMP genre on a level.\n\`${commandName} OLD-LEV-EL0 NEW-LEV-EL0\` to update a level's code\n\`${commandName} mod:DISCORD_USER_ID\` to update a mod username.`
+    const usage = `Your command is invalid. Use the command in one of the following ways:\n\`${commandName} XXX-XXX-XXX\` to update a level's info or a maker name.\n\`${commandName} XXX-XXX-XXX genre\` to update the THWOMP genre on a level.\n\`${commandName} OLD-LEV-EL0 NEW-LEV-EL0\` to update a level's code\n\`${commandName} curator:DISCORD_USER_ID\` to update a curator username.`
 
     // we're going to remove all the things we need from this. If there are still terms left one is invalid
     let searchTerms = parameters
@@ -27,11 +27,11 @@ async function thwomp_level_update(parameters, commandName, message) {
         }
     })
 
-    // get all mods
-    let mods = []
+    // get all curators
+    let curators = []
     searchTerms = searchTerms.filter(term => {
-        if (term.match(/^mod:/)) {
-            mods.push(term.replace(/^mod:/, ""))
+        if (term.match(/^curator:/)) {
+            curators.push(term.replace(/^curator:/, ""))
             return false
         } else {
             return true
@@ -55,7 +55,7 @@ async function thwomp_level_update(parameters, commandName, message) {
 
     // delete repeats
     codes = codes.filter((code, i, arr) => arr.indexOf(code) == i)
-    mods = mods.filter((code, i, arr) => arr.indexOf(code) == i)
+    curators = curators.filter((code, i, arr) => arr.indexOf(code) == i)
     genres = genres.filter((code, i, arr) => arr.indexOf(code) == i)
 
     // separate codes into maker and level codes (verify they exist as well)
@@ -74,7 +74,7 @@ async function thwomp_level_update(parameters, commandName, message) {
     }
 
     // length of each for command type
-    const lengthOfEach = "l" + levelJSONs.length + "u" + makerJSONs.length + "m" + mods.length + "g" + genres.length
+    const lengthOfEach = "l" + levelJSONs.length + "u" + makerJSONs.length + "m" + curators.length + "g" + (genres.length > 0 ? 1 : 0)
 
     let entry
     let levelJSON
@@ -131,17 +131,15 @@ async function thwomp_level_update(parameters, commandName, message) {
             await entry.save()
             return `The maker has been updated to ${entry.name}`
         case "l0u0m1g0":
-            // update mode username
-            const modId = mods[0]
-            let discordUser = await message.guild.members.cache.get(modId)
+            // update mod username
+            const curatorId = curators[0]
+            let discordUser = await message.guild.members.cache.get(curatorId)
             if (!discordUser) return `No user by that ID is in this server.`
-            const thwompMod = await ThwompUploader.findOne({ id: modId })
-            if (!thwompMod) return `No user by that ID is in THWOMP`
-            thwompMod.name = discordUser.user.username
-            await thwompMod.save()
-            return `Successfully updated the user's name to \`${thwompMod.name}\``
-        case "l0u0m2g0":
-            return `Not yet implemented. Please contact birddog to either finish this command or manually update the mod's name.`
+            const thwompCurator = await ThwompUploader.findOne({ id: curatorId })
+            if (!thwompCurator) return `No user by that ID is in THWOMP`
+            thwompCurator.name = discordUser.user.username
+            await thwompCurator.save()
+            return `Successfully updated the user's name to \`${thwompCurator.name}\``
         default:
             return usage
     }
