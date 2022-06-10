@@ -1,67 +1,105 @@
 // get stats for thwomp levels
 
 // requires
-const { ChartJSNodeCanvas } = require("chartjs-node-canvas")
-const { MessageAttachment, MessageEmbed } = require("discord.js")
+const { ctg } = require("../constants/thwomp_genre_code")
+const { createPieGraph } = require("../functions/createGraph")
+const ThwompEntry = require("../models/ThwompEntry")
 
 async function thwomp_stats(parameters, commandName, message) {
 
-    const testData = [
-        {
-            "members": 1946,
-            "date": "10/1/2020"
-        },
-        {
-            "members": 2011,
-            "date": "10/2/2020"
-        },
-        {
-            "members": 2072,
-            "date": "10/3/2020"
-        },
-        {
-            "members": 2119,
-            "date": "10/4/2020"
-        },
-        {
-            "members": 2172,
-            "date": "10/5/2020"
-        },
-    ]
+    const usage = commandName + " tag"
 
-    const members = testData.map(el => el.members)
-    const dates = testData.map(el => el.date)
+    if (parameters.length != 1) return `This command requires one parameter. Please use the command as follows (tags: \`curators\`, \`makers\`, \`difficulties\`, \`genres\`, and \`puzzle genres\`): \`${usage}\``
 
-    const canvas = new ChartJSNodeCanvas(
-        800,
-        600,
-        chartCallback
-    )
-
-    const config = {
-        type: "bar",
-        data: {
-            labels: dates,
-            datasets: [
-                {
-                    label: "test",
-                    data: members,
-                    backgroundColor: "#7289d9"
-                }
-            ]
-        }
+    // tag to path, array means the data is in an array and the first index is the extra path after getting in the array
+    const ttp = {
+        curators: ["thwomp.uploaders", "name"],
+        curator: ["thwomp.uploaders", "name"],
+        makers: "course.uploader.name",
+        maker: "course.uploader.name",
+        difficulties: "course.difficulty",
+        difficulty: "course.difficulty",
+        genres: ["course.genres"],
+        genre: ["course.genres"],
+        puzzlegenres: ["thwomp.genres"],
+        puzzlegenre: ["thwomp.genres"],
     }
 
-    const image = await canvas.renderToBuffer(config)
-    const attachment = new MessageAttachment(image)
+    const dataPath = ttp?.[parameters[0]]
+    if (!dataPath) return `The tag you have entered is invalid. Please use one of the following tags: \`curators\`, \`makers\`, \`difficulties\`, \`genres\`, or \`puzzle genres\`.`
+
+    const entries = await ThwompEntry.find({}).populate("course.uploader thwomp.uploaders")
+    const dataset = {}
+    if (typeof dataPath == "string") {
+        entries.forEach(entry => {
+            const dataValue = getNestedObject(entry, dataPath)
+            if (dataset?.[dataValue]) {
+                dataset[dataValue]++
+            } else {
+                dataset[dataValue] = 1
+            }
+        })
+    } else {
+        entries.forEach(entry => {
+            const dataArr = getNestedObject(entry, dataPath[0])
+            dataArr.forEach(dataPoint => {
+                const dataValue = getNestedObject(dataPoint, dataPath?.[1])
+                if (dataset?.[dataValue]) {
+                    dataset[dataValue]++
+                } else {
+                    dataset[dataValue] = 1
+                }
+            })
+        })
+    }
+    
+    // remove Puzzle solving from genres
+    if (dataset?.["Puzzle solving"]) delete dataset["Puzzle solving"]
+
+    // convert th, er, em, os to names
+    if (dataPath?.[0] == ttp.puzzlegenres[0]) {
+        Object.keys(dataset).forEach(key => {
+            const newKey = ctg[key]
+            dataset[newKey] = dataset[key]
+            delete dataset[key]
+        })
+    }
+
+    // create "other" tag
+    let smallestPortion = 0 // 0 is the max value for a portion
+    let otherPortion = 0.05
+    const dataSize = Object.values(dataset).reduce((a, b) => a + b)
+    Object.keys(dataset).forEach(key => {
+        const portion = dataset[key] / dataSize
+        if (portion < otherPortion && portion > smallestPortion) {
+            smallestPortion = portion
+        }
+    })
+    if (smallestPortion != 0) {
+        dataset.Other = 0
+        Object.keys(dataset).forEach(key => {
+            if (dataset[key] <= smallestPortion * dataSize) {
+                dataset.Other += dataset[key]
+                delete dataset[key]
+            }
+        })
+    }
+
+    const attachment = await createPieGraph(dataset)
 
     return {
-        embed: new MessageEmbed(),
-        attachment,
+        attachment
     }
 
 }
 
-const chartCallback = (ChartJS) => { }
+function getNestedObject(obj, path) {
+    if (!path) return obj
+    let obj2 = obj
+    path.split(".").forEach(el => {
+        obj2 = obj2[el]
+    })
+    return obj2
+}
 
-exports.run = thwomp_stats  
+exports.run = thwomp_stats

@@ -83,7 +83,7 @@ const commands = [
 ]
 
 // other constants to be used in main
-const combineTerms = ["short and sweet", "puzzle solving", "multiplayer vs", "multiplayer versus", "boss battle", "single player", "one screen puzzle", "one screen", "escape the mansion", "escape room", "super expert", "one-screen puzzle", "escape the mansion puzzle", "escape room puzzle", "themed puzzle"] // what to combine so it does not get split up in the command arguments
+const combineTerms = ["puzzle genre", "puzzle genres", "short and sweet", "puzzle solving", "multiplayer vs", "multiplayer versus", "boss battle", "single player", "one screen puzzle", "one screen", "escape the mansion", "escape room", "super expert", "one-screen puzzle", "escape the mansion puzzle", "escape room puzzle", "themed puzzle"] // what to combine so it does not get split up in the command arguments
 
 // bot is online message
 client.once("ready", () => {
