@@ -1,7 +1,8 @@
 const standard = ["standard"]
 const art = ["art"]
 const link = ["link"]
-const auto = ["auto-mario", "automario", "auto"]
+const autoMario = ["auto-mario", "automario", "auto"]
+const autoscroll = ["autoscroll", "auto-scroll"]
 const singleplayer = ["singleplayer"]
 const music = ["music"]
 const boss = ["bossbattle", "boss"]
@@ -17,7 +18,8 @@ const mm2Genres = [
     ...standard,
     ...art,
     ...link,
-    ...auto,
+    ...autoMario,
+    ...autoscroll,
     ...singleplayer,
     ...music,
     ...boss,
@@ -34,7 +36,7 @@ const genre_to_formatted = {
     ...standard.reduce((obj, key) => ({ ...obj, [key]: "Standard"}), {}),
     ...art.reduce((obj, key) => ({ ...obj, [key]: "Art"}), {}),
     ...link.reduce((obj, key) => ({ ...obj, [key]: "Link"}), {}),
-    ...auto.reduce((obj, key) => ({ ...obj, [key]: "Auto mario"}), {}),
+    ...autoMario.reduce((obj, key) => ({ ...obj, [key]: "Auto mario"}), {}),
     ...singleplayer.reduce((obj, key) => ({ ...obj, [key]: "Single player"}), {}),
     ...music.reduce((obj, key) => ({ ...obj, [key]: "Music"}), {}),
     ...boss.reduce((obj, key) => ({ ...obj, [key]: "Boss battle"}), {}),
@@ -45,6 +47,7 @@ const genre_to_formatted = {
     ...technical.reduce((obj, key) => ({ ...obj, [key]: "Technical"}), {}),
     ...shooter.reduce((obj, key) => ({ ...obj, [key]: "Shooter"}), {}),
     ...speedrun.reduce((obj, key) => ({ ...obj, [key]: "Speedrun"}), {}),
+    ...autoscroll.reduce((obj, key) => ({ ...obj, [key]: "Autoscroll"}), {}),
 }
 
 exports.mm2Genres = mm2Genres
