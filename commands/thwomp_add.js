@@ -1,7 +1,7 @@
 // add a level to the THWOMP data base
 
 // requires
-const { gtc } = require("../constants/thwomp_genre_code")
+const { getThwompGenreCode } = require("../constants/thwomp_genre_code")
 const tgr = require("../functions/tgrAPI")
 const ThwompEntry = require("../models/ThwompEntry")
 const CourseUploader = require("../models/CourseUploader")
@@ -14,7 +14,7 @@ async function thwomp_add(parameters, commandName, message, botVars) {
 
     // check if the first parameter is a code
     const codes = parameters.filter(param => param.match(/...-...-.../))
-    const genres = parameters.filter(param => gtc[param]).map(genre => gtc[genre]).filter((genre, i, arr) => arr.indexOf(genre) == i)
+    const genres = parameters.filter(param => getThwompGenreCode(param)).map(genre => getThwompGenreCode(genre)).filter((genre, i, arr) => arr.indexOf(genre) == i)
 
     // there are 0 or 2+ codes in the level
     if (codes.length != 1) {

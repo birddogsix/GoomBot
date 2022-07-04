@@ -23,6 +23,8 @@ async function thwomp_stats(parameters, commandName, message) {
         genre: ["course.genres"],
         puzzlegenres: ["thwomp.genres"],
         puzzlegenre: ["thwomp.genres"],
+        "puzzle genres": ["thwomp.genres"],
+        "puzzle genre": ["thwomp.genres"],
     }
 
     const dataPath = ttp?.[parameters[0]]

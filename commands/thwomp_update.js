@@ -4,7 +4,7 @@
 const tgr = require("../functions/tgrAPI")
 const CourseUploader = require("../models/CourseUploader")
 const ThwompEntry = require("../models/ThwompEntry")
-const { gtc } = require("../constants/thwomp_genre_code")
+const { getThwompGenreCode } = require("../constants/thwomp_genre_code")
 const ThwompUploader = require("../models/ThwompUploader")
 
 async function thwomp_level_update(parameters, commandName, message) {
@@ -41,8 +41,8 @@ async function thwomp_level_update(parameters, commandName, message) {
     // get genres
     let genres = []
     searchTerms = searchTerms.filter(term => {
-        if (gtc?.[term]) {
-            genres.push(gtc[term])
+        if (getThwompGenreCode(term)) {
+            genres.push(getThwompGenreCode(term))
             return false
         } else {
             return true

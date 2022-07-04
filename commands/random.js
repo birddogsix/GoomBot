@@ -13,7 +13,8 @@ async function random_level_info(parameters, commandName, message) {
         easy: "e",
         normal: "n",
         expert: "ex",
-        superexpert: "sex"
+        superexpert: "sex",
+        "super expert": "sex",
     }
 
     if (parameters.length > 1) return `This command can only take up to 1 parameter. Use the command as follows (difficulty is optional): \`${usage}\``

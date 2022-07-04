@@ -21,69 +21,68 @@ env.config()
 const mg = require("mongoose")
 mg.connect(process.env.MONGOURI)
 
+const { replacements, combineTerms } = require("./functions/replaceTerms")
+
 // import all of the commands
 const commands = [
     {
-        name: "tadd",
+        names: ["tadd", "thwompadd"],
         command: require("./commands/thwomp_add"),
         clearances: [botVars.curatorId]
     },
     {
-        name: "tremove",
+        names: ["tremove", "thwompremove"],
         command: require("./commands/thwomp_remove"),
         clearances: [botVars.curatorId]
     },
     {
-        name: "tupdate",
+        names: ["tupdate", "thwompupdate"],
         command: require("./commands/thwomp_update"),
         clearances: [botVars.curatorId]
     },
     {
-        name: "tclean",
+        names: ["tclean", "thwompclean"],
         command: require("./commands/thwomp_clean_unused"),
         clearances: [botVars.curatorId]
     },
     {
-        name: "tcheck",
+        names: ["tcheck", "thwompcheck"],
         command: require("./commands/thwomp_check"),
         clearances: [botVars.curatorId]
     },
     {
-        name: "tsearch",
+        names: ["tsearch", "thwompsearch"],
         command: require("./commands/thwomp_filtered_search")
     },
     {
-        name: "trandom",
+        names: ["trandom", "thwomprandom"],
         command: require("./commands/thwomp_random")
     },
     {
-        name: "tinfo",
+        names: ["tinfo", "thwompinfo"],
         command: require("./commands/thwomp_level_info")
     },
     {
-        name: "help",
+        names: ["help", "thelp", "thwomphelp"],
         command: require("./commands/help")
     },
     {
-        name: "tstats",
+        names: ["tstats", "thwompstats"],
         command: require("./commands/thwomp_stats")
     },
     {
-        name: "info",
+        names: ["info"],
         command: require("./commands/info")
     },
     {
-        name: "random",
+        names: ["random"],
         command: require("./commands/random")
     },
     {
-        name: "new",
+        names: ["new"],
         command: require("./commands/new")
     },
 ]
-
-// other constants to be used in main
-const combineTerms = ["auto scroll", "puzzle genre", "puzzle genres", "short and sweet", "puzzle solving", "multiplayer vs", "multiplayer versus", "boss battle", "single player", "one screen puzzle", "one screen", "escape the mansion", "escape room", "super expert", "one-screen puzzle", "escape the mansion puzzle", "escape room puzzle", "themed puzzle"] // what to combine so it does not get split up in the command arguments
 
 // bot is online message
 client.once("ready", () => {
@@ -105,15 +104,22 @@ client.on("messageCreate", async (message) => {
     // check if it is a command for the bot
     if (!message.content.match(new RegExp(`^${botVars.prefix}`))) return
 
-    // prepare arguments (lower case everything and replace extra spaces, combine terms, split, remove first g! from command)
-    let args = message.content.replace(`${botVars.prefix}`, "").replaceAll(/\n/g, " ").replaceAll(/ {2,}/g, " ").toLowerCase()
-    combineTerms.forEach(term => {
-        args = args.replaceAll(new RegExp(`${term}`, "g"), term.replaceAll(" ", ""))
+    // prepare arguments (remove prefix, lower case everything, only split elements not in combineTerms or not surrounded by quotes, replace multiple white spaces with just one)
+    let args = message.content.replace(`${botVars.prefix}`, "").toLowerCase()
+    args = combineTerms(args)
+    args = args.split(/\s+(?=(?:[^\s]*:)?".*")|(?<=".*")\s+/g) // checks for spaces that surround "" or filter:""
+    args = args.map(arg => {
+        if (!arg.match(/^(?:.*:)?".*"$/)) { // if it is not surrounded by "" or filter:""
+            arg = arg.split(/\s+/) // split by spaces
+        } else {
+            arg = arg.replace(/(?<=^[^\s]*:|^)"|"$/g, "") // remove quotes
+        }
+        return arg
     })
-    args = args.split(" ")
+    args = args.flat() // flatten nested arrays from the secondary split
 
     // run commands
-    const currentCommand = commands.find(command => command.name == args[0])
+    const currentCommand = commands.find(command => command.names.includes(args[0]))
     if (currentCommand) {
 
         // letting the person know we are working on it with a reaction
@@ -128,7 +134,7 @@ client.on("messageCreate", async (message) => {
         const mainGuild = await client.guilds.fetch(botVars.guildId)
         const commandIssuer = await mainGuild.members.fetch(message.author.id)
         if (!currentCommand?.clearances || commandIssuer._roles.find(role => currentCommand.clearances.includes(role))) {
-            answer = await currentCommand.command.run(args, botVars.prefix + currentCommand.name, message, botVars).catch(err => console.log(err))
+            answer = await currentCommand.command.run(args, botVars.prefix + currentCommand.names[0], message, botVars).catch(err => console.log(err))
         } else {
             answer = "You do not have permission to use that command."
         }

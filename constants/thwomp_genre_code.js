@@ -1,14 +1,10 @@
-const OSs = ["os", "osp", "onescreen", "onescreenpuzzle", "one-screenpuzzle"]
-const ERs = ["er", "escaperoom", "escaperoompuzzle"]
-const EMs = ["em", "etm", "escapethemansion", "escapethemansionpuzzle"]
-const THs = ["th", "themed", "themedpuzzle"]
-
-const genreToCode = {
-    ...OSs.reduce((obj, key) => ({ ...obj, [key]: "os"}), {}),
-    ...ERs.reduce((obj, key) => ({ ...obj, [key]: "er"}), {}),
-    ...EMs.reduce((obj, key) => ({ ...obj, [key]: "em"}), {}),
-    ...THs.reduce((obj, key) => ({ ...obj, [key]: "th"}), {}),
+const thwompGenres = {
+    "os": /^osp?|one(?:\s|-)*screen\s*(?:puzzle)?$/,
+    "er": /^erp?|escape\s*room\s*(?:puzzle)?$/,
+    "em": /^et?mp?|escape\s*the\s*mansion\s*(?:puzzle)?$/,
+    "th": /^thp?|themed\s*(?:puzzle)?$/,
 }
+const getThwompGenreCode = (str) => typeof str == "string" ? Object.keys(thwompGenres).find(key => str.match(thwompGenres[key])) : undefined
 
 const codeToGenre = {
     "os": "One screen puzzle",
@@ -17,5 +13,6 @@ const codeToGenre = {
     "th": "Themed puzzle"
 }
 
-exports.gtc = genreToCode
+exports.getThwompGenreCode = getThwompGenreCode
 exports.ctg = codeToGenre
+exports.thwompGenreRegEx = thwompGenres
