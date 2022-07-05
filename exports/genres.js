@@ -1,5 +1,3 @@
-
-
 const standard = ["standard"]
 const art = ["art"]
 const link = ["link"]

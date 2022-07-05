@@ -1,8 +1,8 @@
 // get a list of levels meeting search criteria in parameters
 
 // requires
-const { gtf } = require("../constants/genres")
-const { getThwompGenreCode } = require("../constants/thwomp_genre_code")
+const { gtf } = require("./genres")
+const { getThwompGenreCode } = require("./thwomp_genre_code")
 const CourseUploader = require("../models/CourseUploader")
 const ThwompUploader = require("../models/ThwompUploader")
 const ThwompEntry = require("../models/ThwompEntry")
