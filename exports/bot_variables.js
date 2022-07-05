@@ -1,20 +1,16 @@
-// variables for the main bot
-const default_bot_variables = {
-    prefix: "g!",
-    guildId: "970383307500036137", // change these when we move to the main server
-    curatorId: "971883166375755786",
-    modId: "971883166375755786",
-    notificationChannel: "974403970716037202",
+const env = require("dotenv")
+env.config()
+
+const { BOT_TOKEN, PREFIX, GUILD_ID, CURATOR_ID, MODERATOR_ID, NOTIFICATION_CHANNEL, MONGOURI } = process.env
+
+config = {
+    BOT_TOKEN,
+    PREFIX,
+    GUILD_ID,
+    CURATOR_ID,
+    MODERATOR_ID,
+    NOTIFICATION_CHANNEL,
+    MONGOURI
 }
 
-// variables for when we are testing on a different bot
-const testing_bot_variables = {
-    prefix: "t!",
-    guildId: "970383307500036137",
-    curatorId: "971883166375755786",
-    modId: "971883166375755786",
-    notificationChannel: "974403970716037202",
-}
-
-exports.regular = default_bot_variables
-exports.testing = testing_bot_variables
+exports.config = config

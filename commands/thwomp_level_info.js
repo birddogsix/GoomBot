@@ -1,6 +1,6 @@
 // display information on a single level code you submitted in THWOMP
 
-const { thwomp_level_embed } = require("../functions/thwomp_level_info_embed")
+const { thwomp_level_embed } = require("../exports/thwomp_level_info_embed")
 const ThwompEntry = require("../models/ThwompEntry")
 
 // requires
@@ -22,7 +22,7 @@ async function thwomp_level_info(parameters, commandName, message, botVars) {
     const levelEmbed = await thwomp_level_embed(thwompLevel)
 
     if (levelEmbed == "Invalid course ID") {
-        const notifChannel = await message.guild.channels.cache.get(botVars.notificationChannel)
+        const notifChannel = await message.guild.channels.cache.get(botVars.NOTIFICATION_CHANNEL)
         notifChannel
             .send(`The code \`${thwompLevel.course.id.replace(/(...)(...)(...)/g, "$1-$2-$3")}\` no longer works. The level was called \`${thwompLevel.course.name}\` and it was uploaded by \`${thwompLevel.course.uploader.name}\` with the maker code \`${thwompLevel.course.uploader.id.replace(/(...)(...)(...)/g, "$1-$2-$3")}\`.`)
             .catch(err => console.log(err))

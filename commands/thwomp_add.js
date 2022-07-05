@@ -1,8 +1,8 @@
 // add a level to the THWOMP data base
 
 // requires
-const { getThwompGenreCode } = require("../constants/thwomp_genre_code")
-const tgr = require("../functions/tgrAPI")
+const { getThwompGenreCode } = require("../exports/thwomp_genre_code")
+const tgr = require("../exports/tgrAPI")
 const ThwompEntry = require("../models/ThwompEntry")
 const CourseUploader = require("../models/CourseUploader")
 const ThwompUploader = require("../models/ThwompUploader")
@@ -10,7 +10,7 @@ const ThwompUploader = require("../models/ThwompUploader")
 // command function contents
 async function thwomp_add(parameters, commandName, message, botVars) {
 
-    const usage = `${commandName} LEV-ELC-ODE genre(s)`
+    const usage = `${commandName} LEV-ELC-ODE tag(s)`
 
     // check if the first parameter is a code
     const codes = parameters.filter(param => param.match(/...-...-.../))
@@ -23,7 +23,7 @@ async function thwomp_add(parameters, commandName, message, botVars) {
 
     // there are no genres listed
     if (genres.length == 0) {
-        return `The command \`${commandName}\` requires at least one genre (such as one screen puzzle, escape room, escape the mansion, etc). Use the command as follows: \`${usage}\``
+        return `The command \`${commandName}\` requires at least one tag (such as one screen puzzle, escape room, escape the mansion, etc). Use the command as follows: \`${usage}\``
     }
 
     const code = codes[0].replaceAll("-", "").toUpperCase()
@@ -63,7 +63,7 @@ async function thwomp_add(parameters, commandName, message, botVars) {
             name: levelJSON.uploader.name,
             id: levelJSON.uploader.code
         })
-        const notifChannel = await message.guild.channels.cache.get(botVars.notificationChannel)
+        const notifChannel = await message.guild.channels.cache.get(botVars.NOTIFICATION_CHANNEL)
         notifChannel.send(`\`${courseUploader.name}\` has had their first level added to THWOMP!`).catch(err => console.log(err))
     }
     await courseUploader.save()

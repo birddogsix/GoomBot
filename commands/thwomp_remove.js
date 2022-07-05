@@ -1,7 +1,7 @@
 // remove a level from THWOMP data base
 
 // requires
-const tgr = require("../functions/tgrAPI")
+const tgr = require("../exports/tgrAPI")
 const ThwompEntry = require("../models/ThwompEntry")
 const CourseUploader = require("../models/CourseUploader")
 
@@ -26,7 +26,7 @@ async function thwomp_remove(parameters, commandName, message, botVars) {
     const stillHasLevels = await ThwompEntry.findOne({ "course.uploader": entry.course.uploader })
     if (!stillHasLevels) {
         // send notif and delete user from thwompuploaders
-        const notifChannel = await message.guild.channels.cache.get(botVars.notificationChannel)
+        const notifChannel = await message.guild.channels.cache.get(botVars.NOTIFICATION_CHANNEL)
         const uploader = await CourseUploader.findOne({ "_id": entry.course.uploader })
         await CourseUploader.deleteOne({ "_id": entry.course.uploader })
         notifChannel.send(`User \`${uploader.name}\` no longer has any levels in THWOMP`)

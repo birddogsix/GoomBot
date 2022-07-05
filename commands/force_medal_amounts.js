@@ -1,13 +1,13 @@
 // when a member updates their nickname make sure their medals were constant and unchanged
 
-const { getMedals } = require("../functions/get_medals")
+const { getMedals } = require("../exports/get_medals")
 
 // requires
 
 
 async function force_medal_amounts(oldMember, newMember, clearances, botVars) {
 
-    if (newMember.guild.id != botVars.guildId) return
+    if (newMember.guild.id != botVars.GUILD_ID) return
 
     // get who did it
     const updateLogs = await newMember.guild.fetchAuditLogs({
@@ -61,7 +61,7 @@ async function force_medal_amounts(oldMember, newMember, clearances, botVars) {
         newMember.setNickname(finalName).catch(err => console.log(err))
 
         // send message to channel
-        const notifChannel = await newMember.guild.channels.cache.get(botVars.notificationChannel)
+        const notifChannel = await newMember.guild.channels.cache.get(botVars.NOTIFICATION_CHANNEL)
         notifChannel.send(`Username update: \`${oldName}\` to \`${newName}\`. Updated to: \`${finalName}\``).catch(err => console.log(err))
 
     }

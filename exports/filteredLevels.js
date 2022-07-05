@@ -50,7 +50,7 @@ async function thwomp_filtered_levels_list(parameters, limit = Infinity) {
             return new RegExp(`^${extractedTerm}$`, "i")
         },
         genres: (term) => {
-            const extractedTerm = term.match(/^(?:genre:)?(.*)$/)?.[1]
+            const extractedTerm = term.match(/^(?:genre:|tag:)?(.*)$/)?.[1]
             return extractedTerm == "themed" ? ["th", "themed"] : gtf?.[extractedTerm] ?? getThwompGenreCode(extractedTerm)
         },
     }
@@ -73,7 +73,7 @@ async function thwomp_filtered_levels_list(parameters, limit = Infinity) {
     const newCurators = (await Promise.all(
         searchParameters.curators.map(curator => ThwompUploader.findOne({ "$or": [{ "name": curator }, { "id": curator }] }))
     )).filter(curator => curator)
-    const missedCurators = searchParameters.curators.filter(curator => !newCurators.some(newCurator => newCurator.name.match(curator))).map(missed => missed.toString().replace(/^\/\^|\$\/i$/g, ""))
+    const missedCurators = searchParameters.curators.filter(curator => !newCurators.some(newCurator => newCurator.name.match(curator) || newCurator.id.match(curator))).map(missed => missed.toString().replace(/^\/\^|\$\/i$/g, ""))
     if (missedCurators.length > 0) {
         const formattedMissedCurators = "\`" + (missedCurators.length == 1 ? missedCurators.toString() : missedCurators.length == 2 ? missedCurators.join("\` and \`") : missedCurators.slice(0, -1).join("\`, \`") + "\`, and \`" + missedCurators.slice(-1)) + "\`"
         return `The curator${missedCurators.length == 1 ? "" : "s"} ${formattedMissedCurators} ${missedCurators.length == 1 ? "was" : "were"} not found in THWOMP. Please try again with an updated curator list.`

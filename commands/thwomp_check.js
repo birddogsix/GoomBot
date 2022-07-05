@@ -1,7 +1,7 @@
 // check if any level codes are outdated
 
 //requires
-const { levelSearch } = require("../functions/tgrAPI")
+const { levelSearch } = require("../exports/tgrAPI")
 const ThwompEntry = require("../models/ThwompEntry")
 
 async function thwomp_check_invalid(parameters, commandName, message) {

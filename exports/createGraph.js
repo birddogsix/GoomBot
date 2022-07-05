@@ -3,9 +3,9 @@
 // requires
 const { ChartJSNodeCanvas } = require("chartjs-node-canvas")
 const { MessageAttachment, MessageEmbed } = require("discord.js")
-const { getPalette } = require("../functions/colorPalette")
+const { getPalette } = require("./colorPalette")
 
-async function createPieGraph(dataset, width = 400, height = 400) {
+async function createPieGraph(dataset, note, width = 400, height = 400) {
 
     const chart1 = new ChartJSNodeCanvas({ width, height })
 
@@ -20,6 +20,11 @@ async function createPieGraph(dataset, width = 400, height = 400) {
         },
         options: {
             plugins: {
+                title: {
+                    display: !!note,
+                    position: "bottom",
+                    text: note
+                },
                 legend: {
                     labels: {
                         color: "white"

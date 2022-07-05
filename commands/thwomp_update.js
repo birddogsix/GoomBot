@@ -1,17 +1,17 @@
 // updates a level in thwomp to its current information
 
 // requires
-const tgr = require("../functions/tgrAPI")
+const tgr = require("../exports/tgrAPI")
 const CourseUploader = require("../models/CourseUploader")
 const ThwompEntry = require("../models/ThwompEntry")
-const { getThwompGenreCode } = require("../constants/thwomp_genre_code")
+const { getThwompGenreCode } = require("../exports/thwomp_genre_code")
 const ThwompUploader = require("../models/ThwompUploader")
 
 async function thwomp_level_update(parameters, commandName, message) {
 
     // we also need to include genre updates
 
-    const usage = `Your command is invalid. Use the command in one of the following ways:\n\`${commandName} XXX-XXX-XXX\` to update a level's info or a maker name.\n\`${commandName} XXX-XXX-XXX genre\` to update the THWOMP genre on a level.\n\`${commandName} OLD-LEV-EL0 NEW-LEV-EL0\` to update a level's code\n\`${commandName} curator:DISCORD_USER_ID\` to update a curator username.`
+    const usage = `Your command is invalid. Use the command in one of the following ways:\n\`${commandName} XXX-XXX-XXX\` to update a level's info or a maker name.\n\`${commandName} XXX-XXX-XXX tag\` to update the THWOMP tag on a level.\n\`${commandName} OLD-LEV-EL0 NEW-LEV-EL0\` to update a level's code\n\`${commandName} curator:DISCORD_USER_ID\` to update a curator username.`
 
     // we're going to remove all the things we need from this. If there are still terms left one is invalid
     let searchTerms = parameters
@@ -87,7 +87,7 @@ async function thwomp_level_update(parameters, commandName, message) {
             entry.thwomp.genres = genres
             entry.thwomp.modified = Date.now()
             await entry.save()
-            return `Successfully changed the genre of the level \`${entry.course.name}\``
+            return `Successfully changed the tag of the level \`${entry.course.name}\``
         case "l1u0m0g0":
             // update level info
             levelJSON = levelJSONs[0]

@@ -1,8 +1,8 @@
 // gets a random level and sends info about it
 
 // requires
-const { level_embed } = require("../functions/level_info_embed")
-const { endlessSearch } = require("../functions/tgrAPI")
+const { level_embed } = require("../exports/level_info_embed")
+const { endlessSearch } = require("../exports/tgrAPI")
 
 async function random_level_info(parameters, commandName, message) {
 

@@ -1,8 +1,8 @@
 // get a a random level from thwomp with the specified parameters
 
 // requires
-const thwomp = require("../functions/filteredLevels")
-const { thwomp_level_embed } = require("../functions/thwomp_level_info_embed")
+const thwomp = require("../exports/filteredLevels")
+const { thwomp_level_embed } = require("../exports/thwomp_level_info_embed")
 
 async function thwomp_random_level_info(parameters, commandName, message) {
 

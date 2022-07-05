@@ -1,7 +1,7 @@
 // get a list of all levels with the given parameters
 
 // requires
-const thwomp = require("../functions/filteredLevels")
+const thwomp = require("../exports/filteredLevels")
 
 async function thwomp_filtered_search(parameters, commandName, message) {
 

@@ -1,6 +1,7 @@
 const replacements = {
     "auto scroll": /auto(?:\s?scroll)?/,
     "puzzle genre": /puzzle\s?genres?/,
+    "puzzle tag": /puzzle\s?tags?/,
     "short and sweet": /short\s?and\s?sweet/,
     "puzzle solving": /puzzle(?:\s|-)?solving/,
     "multiplayer versus": /multiplayer(?:\s?v(?:ersu)?s)?/,

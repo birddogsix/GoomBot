@@ -1,15 +1,15 @@
 // get stats for thwomp levels
 
 // requires
-const { ctg } = require("../constants/thwomp_genre_code")
-const { createPieGraph } = require("../functions/createGraph")
+const { ctg } = require("../exports/thwomp_genre_code")
+const { createPieGraph } = require("../exports/createGraph")
 const ThwompEntry = require("../models/ThwompEntry")
 
-async function thwomp_stats(parameters, commandName, message) {
+async function thwomp_stats(parameters, commandName) {
 
     const usage = commandName + " tag"
 
-    if (parameters.length != 1) return `This command requires one parameter. Please use the command as follows (tags: \`curators\`, \`makers\`, \`difficulties\`, \`genres\`, and \`puzzle genres\`): \`${usage}\``
+    if (parameters.length != 1) return `This command requires one parameter. Please use the command as follows (tags: \`curators\`, \`makers\`, \`difficulties\`, \`tags\`, and \`puzzle tags\`): \`${usage}\``
 
     // tag to path, array means the data is in an array and the first index is the extra path after getting in the array
     const ttp = {
@@ -21,14 +21,20 @@ async function thwomp_stats(parameters, commandName, message) {
         difficulty: "course.difficulty",
         genres: ["course.genres"],
         genre: ["course.genres"],
+        tag: ["course.genres"],
+        tags: ["course.genres"],
         puzzlegenres: ["thwomp.genres"],
         puzzlegenre: ["thwomp.genres"],
         "puzzle genres": ["thwomp.genres"],
         "puzzle genre": ["thwomp.genres"],
+        puzzletag: ["thwomp.genres"],
+        puzzletags: ["thwomp.genres"],
+        "puzzle tags": ["thwomp.genres"],
+        "puzzle tag": ["thwomp.genres"],
     }
 
     const dataPath = ttp?.[parameters[0]]
-    if (!dataPath) return `The tag you have entered is invalid. Please use one of the following tags: \`curators\`, \`makers\`, \`difficulties\`, \`genres\`, or \`puzzle genres\`.`
+    if (!dataPath) return `The tag you have entered is invalid. Please use one of the following tags: \`curators\`, \`makers\`, \`difficulties\`, \`tags\`, or \`puzzle tags\`.`
 
     const entries = await ThwompEntry.find({}).populate("course.uploader thwomp.uploaders")
     const dataset = {}
@@ -54,9 +60,13 @@ async function thwomp_stats(parameters, commandName, message) {
             })
         })
     }
-    
+
     // remove Puzzle solving from genres
-    if (dataset?.["Puzzle solving"]) delete dataset["Puzzle solving"]
+    let note
+    if (dataset?.["Puzzle solving"]) {
+        note = "Puzzle solving was not included."
+        delete dataset["Puzzle solving"]
+    }
 
     // convert th, er, em, os to names
     if (dataPath?.[0] == ttp.puzzlegenres[0]) {
@@ -87,11 +97,9 @@ async function thwomp_stats(parameters, commandName, message) {
         })
     }
 
-    const attachment = await createPieGraph(dataset)
+    const attachment = await createPieGraph(dataset, note)
 
-    return {
-        attachment
-    }
+    return { attachment }
 
 }
 

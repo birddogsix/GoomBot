@@ -1,9 +1,9 @@
 // show info on a level
 
 // requires
-const { level_embed } = require("../functions/level_info_embed")
-const { maker_embed } = require("../functions/maker_info_embed")
-const tgr = require("../functions/tgrAPI")
+const { level_embed } = require("../exports/level_info_embed")
+const { maker_embed } = require("../exports/maker_info_embed")
+const tgr = require("../exports/tgrAPI")
 
 async function info(parameters, commandName, message) {
 

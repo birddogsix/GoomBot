@@ -4,7 +4,7 @@
 const { MessageEmbed, MessageAttachment } = require("discord.js");
 const { mii_studio_to_code } = require("./mii_studio_code_to_color");
 const tgr = require("./tgrAPI")
-const { ctg } = require("../constants/thwomp_genre_code")
+const { ctg } = require("./thwomp_genre_code")
 
 async function thwomp_level_embed(thwomp_level_info) {
 

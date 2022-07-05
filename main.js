@@ -5,50 +5,44 @@ const { Client, Intents, MessageEmbed, Message, MessageAttachment } = require("d
 const client = new Client({ intents: [Intents.FLAGS.GUILD_PRESENCES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.DIRECT_MESSAGES, Intents.FLAGS.DIRECT_MESSAGE_REACTIONS], partials: ['MESSAGE', 'CHANNEL', 'USER'] })
 
 // import the needed bot variables
-const { regular, testing } = require("./constants/bot_variables")
-const GoomBotId = "969684811193135256"
-let botVars = regular
+const { config } = require("./exports/bot_variables")
 
 // fs and fetch setup
 const fs = require("fs")
 const fetch = require("node-fetch")
 
-// for environment variables
-const env = require("dotenv")
-env.config()
-
 // mongoose models and setup
 const mg = require("mongoose")
-mg.connect(process.env.MONGOURI)
+mg.connect(config.MONGOURI)
 
-const { replacements, combineTerms } = require("./functions/replaceTerms")
+const { replacements, combineTerms } = require("./exports/replaceTerms")
 
 // import all of the commands
 const commands = [
     {
         names: ["tadd", "thwompadd"],
         command: require("./commands/thwomp_add"),
-        clearances: [botVars.curatorId]
+        clearances: [config.CURATOR_ID]
     },
     {
         names: ["tremove", "thwompremove"],
         command: require("./commands/thwomp_remove"),
-        clearances: [botVars.curatorId]
+        clearances: [config.CURATOR_ID]
     },
     {
         names: ["tupdate", "thwompupdate"],
         command: require("./commands/thwomp_update"),
-        clearances: [botVars.curatorId]
+        clearances: [config.CURATOR_ID]
     },
     {
         names: ["tclean", "thwompclean"],
         command: require("./commands/thwomp_clean_unused"),
-        clearances: [botVars.curatorId]
+        clearances: [config.CURATOR_ID]
     },
     {
         names: ["tcheck", "thwompcheck"],
         command: require("./commands/thwomp_check"),
-        clearances: [botVars.curatorId]
+        clearances: [config.CURATOR_ID]
     },
     {
         names: ["tsearch", "thwompsearch"],
@@ -88,11 +82,6 @@ const commands = [
 client.once("ready", () => {
     console.log("Logged in as", client.user.tag)
 
-    // set the bot variables to the correct version (testing or default)
-    if (client.user.id != GoomBotId) {
-        botVars = testing
-    }
-
 })
 
 // on someone sending a message
@@ -102,10 +91,10 @@ client.on("messageCreate", async (message) => {
     if (message.author.bot) return
 
     // check if it is a command for the bot
-    if (!message.content.match(new RegExp(`^${botVars.prefix}`))) return
+    if (!message.content.match(new RegExp(`^${config.PREFIX}`))) return
 
     // prepare arguments (remove prefix, lower case everything, only split elements not in combineTerms or not surrounded by quotes, replace multiple white spaces with just one)
-    let args = message.content.replace(`${botVars.prefix}`, "").toLowerCase()
+    let args = message.content.replace(`${config.PREFIX}`, "").toLowerCase()
     args = combineTerms(args)
     args = args.split(/\s+(?=(?:[^\s]*:)?".*")|(?<=".*")\s+/g) // checks for spaces that surround "" or filter:""
     args = args.map(arg => {
@@ -131,10 +120,10 @@ client.on("messageCreate", async (message) => {
         //run command (check clearance first to see if they have the correct role to run the command)
         let answer
         //const commandIssuer = await message.guild.members.fetch(message.author.id)
-        const mainGuild = await client.guilds.fetch(botVars.guildId)
+        const mainGuild = await client.guilds.fetch(config.GUILD_ID)
         const commandIssuer = await mainGuild.members.fetch(message.author.id)
         if (!currentCommand?.clearances || commandIssuer._roles.find(role => currentCommand.clearances.includes(role))) {
-            answer = await currentCommand.command.run(args, botVars.prefix + currentCommand.names[0], message, botVars).catch(err => console.log(err))
+            answer = await currentCommand.command.run(args, config.PREFIX + currentCommand.names[0], message, config).catch(err => console.log(err))
         } else {
             answer = "You do not have permission to use that command."
         }
@@ -171,7 +160,7 @@ client.on("messageCreate", async (message) => {
 const gmuCommands = [
     {
         command: require("./commands/force_medal_amounts"),
-        clearances: [botVars.modId]
+        clearances: [config.MODERATOR_ID]
     },
 ]
 
@@ -180,10 +169,10 @@ client.on("guildMemberUpdate", async (oldMember, newMember) => {
 
     // run through all commands in this category
     gmuCommands.forEach(current => {
-        current.command.run(oldMember, newMember, current.clearances, botVars).catch(err => console.log(err))
+        current.command.run(oldMember, newMember, current.clearances, config).catch(err => console.log(err))
     })
 
 })
 
 // bot token login
-client.login(process.env.BOT_TOKEN)
+client.login(config.BOT_TOKEN)

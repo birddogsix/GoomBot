@@ -1,8 +1,8 @@
 // send level info for the most recent level
 
 // requires
-const { level_embed } = require("../functions/level_info_embed")
-const { newSearch } = require("../functions/tgrAPI")
+const { level_embed } = require("../exports/level_info_embed")
+const { newSearch } = require("../exports/tgrAPI")
 
 async function new_level_info(parameters, commandName, message) {
 
