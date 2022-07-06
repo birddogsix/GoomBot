@@ -4,12 +4,31 @@
 const { ctg } = require("../exports/thwomp_genre_code")
 const { createPieGraph } = require("../exports/createGraph")
 const ThwompEntry = require("../models/ThwompEntry")
+const CourseUploader = require("../models/CourseUploader")
 
 async function thwomp_stats(parameters, commandName) {
 
+    // send general stats if no parameters
+    if (parameters.length == 0) {
+        const numOfLevels = await ThwompEntry.count({})
+        const numOfMakers = await CourseUploader.count({})
+        const { version } = require('../package.json')
+        const { MessageEmbed} = require("discord.js")
+        const levelEmbed = new MessageEmbed()
+            .setTitle("THWOMP Overview")
+            .setDescription("Version " + version)
+            .addFields(
+                { name: "<:thwomp:984509792523522088> THWOMP Levels", value: String(numOfLevels), inline: true },
+                { name: "<:thwomp:984509792523522088> THWOMP Makers", value: String(numOfMakers), inline: true },
+                
+            )
+            .setTimestamp()
+        return { embed: levelEmbed }
+    }
+
     const usage = commandName + " tag"
 
-    if (parameters.length != 1) return `This command requires one parameter. Please use the command as follows (tags: \`curators\`, \`makers\`, \`difficulties\`, \`tags\`, and \`puzzle tags\`): \`${usage}\``
+    if (parameters.length > 1) return `This command only requires at most one parameter. Please use the command as follows (tags: \`curators\`, \`makers\`, \`difficulties\`, \`tags\`, and \`puzzle tags\`): \`${usage}\``
 
     // tag to path, array means the data is in an array and the first index is the extra path after getting in the array
     const ttp = {
