@@ -40,7 +40,7 @@ async function thwomp_add(parameters, commandName, message, botVars) {
     if (existingLevel) {
 
         let thwompUploader = await ThwompUploader.findOne({ id: message.author.id }) || new ThwompUploader({
-            name: message.author.username,
+            names: message.author.username,
             id: message.author.id
         })
 
@@ -60,7 +60,7 @@ async function thwomp_add(parameters, commandName, message, botVars) {
     let courseUploader = await CourseUploader.findOne({ id: levelJSON.uploader.code })
     if (!courseUploader) {
         courseUploader = new CourseUploader({
-            name: levelJSON.uploader.name,
+            names: [levelJSON.uploader.name],
             id: levelJSON.uploader.code
         })
         const notifChannel = await message.guild.channels.cache.get(botVars.NOTIFICATION_CHANNEL)
@@ -69,7 +69,7 @@ async function thwomp_add(parameters, commandName, message, botVars) {
     await courseUploader.save()
 
     const thwompUploader = await ThwompUploader.findOne({ id: message.author.id }) || new ThwompUploader({
-        name: message.author.username,
+        names: message.author.username,
         id: message.author.id
     })
     await thwompUploader.save()

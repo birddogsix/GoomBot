@@ -16,14 +16,14 @@ const replacements = {
 
 const replaceTerms = (str) => {
     Object.keys(replacements).forEach(replacement => {
-        str = str.replace(new RegExp(`(?<=\\s|^)([a-z]+:)?${replacements[replacement].source}(?=\\s|$)`, "g"), `$1"${replacement}"`)
+        str = str.replace(new RegExp(`(?<=\\s|^)([a-z]+:)?${replacements[replacement].source}(?=\\s|$)`, "g"), `$1\(${replacement}\)`)
     })
     return str
 }
 
 const combineTerms = (str) => {
     Object.values(replacements).forEach(regEx => {
-        str = str.replace(new RegExp(`(?<=\\s|^)([a-z]+:)?(${regEx.source})(?=\\s|$)`, "g"), `$1"$2"`)
+        str = str.replace(new RegExp(`(?<=\\s|^)([a-z]+:)?(${regEx.source})(?=\\s|$)`, "g"), `$1\($2\)`)
     })
     return str
 }

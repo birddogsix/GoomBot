@@ -137,7 +137,7 @@ async function thwomp_level_update(parameters, commandName, message) {
             if (!discordUser) return `No user by that ID is in this server.`
             const thwompCurator = await ThwompUploader.findOne({ id: curatorId })
             if (!thwompCurator) return `No user by that ID is in THWOMP`
-            thwompCurator.name = discordUser.user.username
+            thwompCurator.names = [discordUser.user.username]
             await thwompCurator.save()
             return `Successfully updated the user's name to \`${thwompCurator.name}\``
         default:

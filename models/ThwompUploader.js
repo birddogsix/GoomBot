@@ -1,8 +1,13 @@
 const mg = require("mongoose")
 
 const ThwompUploader = mg.Schema({
-    name: { type: String },
-    id: { type: String, required: true }
+    names: { type: Array },
+    id: { type: String, required: true },
+    isStreamer: { type: Boolean },
+    streamerInfo: {
+        link: { type: String },
+        viewerLevels: { type: Boolean },
+    }
 })
 
 module.exports = mg.model("ThwompUploader", ThwompUploader)

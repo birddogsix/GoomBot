@@ -26,7 +26,7 @@ async function thwomp_level_embed(thwomp_level_info) {
         .setAuthor({ name: thwomp_level_info.course.uploader.name + " (" + thwomp_level_info.course.uploader.id.replace(/(...)(...)(...)/, "$1-$2-$3") + ")", iconURL: miiThumbnail })
         .setDescription(description)
         .addFields(
-            { name: "Submitted by", value: thwomp_level_info.thwomp.uploaders.map(uploader => uploader.name).join(", "), inline: true }
+            { name: "Submitted by", value: thwomp_level_info.thwomp.uploaders.map(uploader => uploader.names[0]).join(", "), inline: true }
         )
         .setImage("attachment://thumbnail.jpg")
         .setFooter({ text: thwomp_level_info.thwomp.genres.map(genre => ctg[genre]).concat(thwomp_level_info.course.genres).join(", ") })

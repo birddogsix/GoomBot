@@ -57,6 +57,14 @@ const commands = [
         command: require("./commands/thwomp_level_info")
     },
     {
+        names: ["tmakers", "thwompmakers"],
+        command: require("./commands/thwomp_maker_list")
+    },
+    {
+        names: ["tcurators", "thwompcurators"],
+        command: require("./commands/thwomp_curator_list")
+    },
+    {
         names: ["help", "thelp", "thwomphelp"],
         command: require("./commands/help")
     },
@@ -81,7 +89,7 @@ const commands = [
 // bot is online message
 client.once("ready", () => {
     console.log("Logged in as", client.user.tag)
-
+    client.user.setActivity("super expert no skip")
 })
 
 // on someone sending a message
@@ -93,19 +101,31 @@ client.on("messageCreate", async (message) => {
     // check if it is a command for the bot
     if (!message.content.match(new RegExp(`^${config.PREFIX}`))) return
 
-    // prepare arguments (remove prefix, lower case everything, only split elements not in combineTerms or not surrounded by quotes, replace multiple white spaces with just one)
+    // prepare arguments (remove prefix, lower case everything, only split elements not in combineTerms or not surrounded by (), replace multiple white spaces with just one)
+    const signifiers = {
+        "difficulties": "difficulty",
+        "genres": "genre",
+        "tags": "tag",
+        "makers": "maker",
+        "levels": "level",
+        "codes": "code",
+        "curators": "curator",
+    }
     let args = message.content.replace(`${config.PREFIX}`, "").toLowerCase()
     args = combineTerms(args)
-    args = args.split(/\s+(?=(?:[^\s]*:)?".*")|(?<=".*")\s+/g) // checks for spaces that surround "" or filter:""
+    // split by spaces not inside of ()
+    args = args.split(/(?<!\([^)]*)\s+(?![^(]*\))/g)
+    console.log(args)
+    // separate signifiers (difficultes:easy,normal into difficulty:easy difficulty:normal)
     args = args.map(arg => {
-        if (!arg.match(/^(?:.*:)?".*"$/)) { // if it is not surrounded by "" or filter:""
-            arg = arg.split(/\s+/) // split by spaces
-        } else {
-            arg = arg.replace(/(?<=^[^\s]*:|^)"|"$/g, "") // remove quotes
+        const matches = arg.match(/^(\w+):([^,]+(?:,+[^,]+)*)/)
+        const signifierSingular = signifiers?.[matches?.[1]] ?? Object.values(signifiers).find(sig => sig == matches?.[1])
+        if (signifierSingular) {
+            const signified = matches[2].split(",").map(s => s.replace(/^\((.*)\)$/, "$1"))
+            return signified.map(sig => signifierSingular + ":" + sig)
         }
-        return arg
-    })
-    args = args.flat() // flatten nested arrays from the secondary split
+        return arg.replace(/^\((.*)\)$/, "$1")
+    }).flat()
 
     // run commands
     const currentCommand = commands.find(command => command.names.includes(args[0]))

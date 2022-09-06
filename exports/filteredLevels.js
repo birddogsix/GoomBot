@@ -23,20 +23,20 @@ async function thwomp_filtered_levels_list(parameters, limit = Infinity) {
 
     //functions we use to get the information from the unused arguments. Make sure these have the same keys as searchParameters
     let extractFunctions = {
-        difficulties: (term) => term.match(/^(?:difficulty:)?(easy|normal|(?:super ?)?expert)$/)?.[1]?.replace("superexpert", "super expert"),
+        difficulties: (term) => term.match(/^(?:difficult(?:y|ies):)?(easy|normal|(?:super ?)?expert)$/)?.[1]?.replace("superexpert", "super expert"),
         levels: (term) => {
-            const extractedArr = term.match(/^(level:|(?:code:)?)(...-...-...)$/)
+            const extractedArr = term.match(/^(levels?:|(?:codes?:)?)(...-...-...)$/)
             const extractedTerm = formatCode(extractedArr?.[2])
             if (!extractedTerm) return
-            if (extractedArr[1] == "level:" || !isMakerCode(extractedTerm)) {
+            if (extractedArr[1].match(/^levels?:$/) || !isMakerCode(extractedTerm)) {
                 return extractedTerm
             }
         },
         makers: (term) => {
-            const extractedArr = term.match(/^(maker:|(?:code:)?)(.*)$/)
+            const extractedArr = term.match(/^(makers?:|(?:codes?:)?)(.*)$/)
             const extractedTerm = extractedArr?.[2]
             if (!extractedTerm) return
-            if (extractedArr[1] == "maker:" || isMakerCode(extractedTerm)) {
+            if (extractedArr[1].match(/^makers?:$/) || isMakerCode(extractedTerm)) {
                 if (extractedTerm.match(/^...-...-...$/)) {
                     return new RegExp(`^${extractedTerm.replace(/-/g, "-?")}$`, "i")
                 } else {
@@ -45,12 +45,12 @@ async function thwomp_filtered_levels_list(parameters, limit = Infinity) {
             }
         },
         curators: (term) => {
-            const extractedTerm = term.match(/^curator:(.*)$/)?.[1]
+            const extractedTerm = term.match(/^curators?:(.*)$/)?.[1]
             if (!extractedTerm) return
             return new RegExp(`^${extractedTerm}$`, "i")
         },
         genres: (term) => {
-            const extractedTerm = term.match(/^(?:genre:|tag:)?(.*)$/)?.[1]
+            const extractedTerm = term.match(/^(?:genres?:|tags?:)?(.*)$/)?.[1]
             return extractedTerm == "themed" ? ["th", "themed"] : gtf?.[extractedTerm] ?? getThwompGenreCode(extractedTerm)
         },
     }
@@ -71,9 +71,9 @@ async function thwomp_filtered_levels_list(parameters, limit = Infinity) {
 
     // convert curators to _id's and send missing errors
     const newCurators = (await Promise.all(
-        searchParameters.curators.map(curator => ThwompUploader.findOne({ "$or": [{ "name": curator }, { "id": curator }] }))
+        searchParameters.curators.map(curator => ThwompUploader.findOne({ "$or": [{ "names": curator }, { "id": curator }] }))
     )).filter(curator => curator)
-    const missedCurators = searchParameters.curators.filter(curator => !newCurators.some(newCurator => newCurator.name.match(curator) || newCurator.id.match(curator))).map(missed => missed.toString().replace(/^\/\^|\$\/i$/g, ""))
+    const missedCurators = searchParameters.curators.filter(curator => !newCurators.some(newCurator => newCurator.names.some(name => name.match(curator)) || newCurator.id.match(curator))).map(missed => missed.toString().replace(/^\/\^|\$\/i$/g, ""))
     if (missedCurators.length > 0) {
         const formattedMissedCurators = "\`" + (missedCurators.length == 1 ? missedCurators.toString() : missedCurators.length == 2 ? missedCurators.join("\` and \`") : missedCurators.slice(0, -1).join("\`, \`") + "\`, and \`" + missedCurators.slice(-1)) + "\`"
         return `The curator${missedCurators.length == 1 ? "" : "s"} ${formattedMissedCurators} ${missedCurators.length == 1 ? "was" : "were"} not found in THWOMP. Please try again with an updated curator list.`
